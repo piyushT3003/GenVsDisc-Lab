@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generative vs Discriminative Lab</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <span class="lg-d">p(y|x)</span><span class="lg-g">p(x|y)</span>
+    </div>
+    <div>
+      <h1>Generative vs. Discriminative Model Lab</h1>
+      <p class="sub">Draw or upload a handwritten digit — see how a <b class="c-d">classifier</b> and a <b class="c-g">generative model</b> each handle it.</p>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="lab" role="tab">Lab</button>
+    <button class="tab" data-tab="studio" role="tab">Generator Studio</button>
+    <button class="tab" data-tab="report" role="tab">Model Report</button>
+    <button class="tab" data-tab="theory" role="tab">Theory</button>
+  </nav>
+</header>
+
+<main>
+<!-- ======================================================= LAB -->
+<section id="tab-lab" class="panel active">
+  <div class="lab-grid">
+    <!-- input -->
+    <div class="card input-card">
+      <div class="card-h"><span class="step">1</span><h2>Input digit</h2></div>
+      <div class="canvas-wrap">
+        <canvas id="pad" width="280" height="280" aria-label="Drawing canvas"></canvas>
+        <div id="padHint" class="pad-hint">Draw a digit here</div>
+      </div>
+      <div class="tools">
+        <button id="btnClear" class="btn ghost">Clear</button>
+        <button id="btnUndo" class="btn ghost">Undo</button>
+        <label class="btn ghost upload">Upload image
+          <input id="file" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+      <div class="row-small">
+        <label for="brush">Brush</label>
+        <input id="brush" type="range" min="10" max="34" value="20">
+        <label class="chk"><input id="auto" type="checkbox" checked> Auto-analyze</label>
+      </div>
+      <button id="btnAnalyze" class="btn primary wide">Analyze digit</button>
+
+      <div class="samples-h">Or try a real MNIST test digit:</div>
+      <div id="samples" class="samples"></div>
+
+      <div class="seen">
+        <div>
+          <div class="mini-h">What the models see</div>
+          <p class="muted">28×28, centred &amp; scaled like MNIST</p>
+          <p id="invNote" class="muted small"></p>
+        </div>
+        <img id="seen28" class="pix" alt="Preprocessed 28 by 28 input" width="112" height="112">
+      </div>
+    </div>
+
+    <!-- results -->
+    <div class="results">
+      <div id="emptyState" class="card empty">
+        <div class="empty-art" aria-hidden="true">✍️</div>
+        <h3>Draw a digit (0–9) to begin</h3>
+        <p>Both models will process it side-by-side. The <b class="c-d">discriminative</b> model answers
+          <i>"which digit is this?"</i> The <b class="c-g">generative</b> model answers
+          <i>"how likely is this image under each digit — and what do digits look like?"</i></p>
+      </div>
+
+      <div id="resultsBody" class="hidden">
+        <div id="agree" class="agree"></div>
+
+        <div class="duo">
+          <!-- discriminative -->
+          <div class="card model d">
+            <div class="card-h"><span class="step d">2</span>
+              <div><h2>Discriminative model</h2><p class="tag">CNN classifier · learns <code>p(y | x)</code></p></div>
+            </div>
+            <div class="verdict">
+              <div class="big-digit" id="dPred">–</div>
+              <div>
+                <div class="conf-label">Confidence</div>
+                <div class="conf" id="dConf">–</div>
+                <div class="muted small" id="dTime"></div>
+              </div>
+            </div>
+            <div class="bars" id="dBars"></div>
+            <details class="more">
+              <summary>Layer-1 feature maps (what the CNN detects)</summary>
+              <div id="fmaps" class="fmaps"></div>
+              <p class="muted small">16 learned 3×3 filters. Bright = strong edge/stroke response. The classifier only learns features useful for <i>separating</i> classes.</p>
+            </details>
+          </div>
+
+          <!-- generative -->
+          <div class="card model g">
+            <div class="card-h"><span class="step g">3</span>
+              <div><h2>Generative model</h2><p class="tag">Conditional VAE · learns <code>p(x | y)</code></p></div>
+            </div>
+            <div class="verdict">
+              <div class="big-digit" id="gPred">–</div>
+              <div>
+                <div class="conf-label">Bayes-rule posterior</div>
+                <div class="conf" id="gConf">–</div>
+                <div class="muted small" id="gTime"></div>
+              </div>
+            </div>
+            <div class="bars" id="gBars"></div>
+            <p class="muted small">Computed as <code>p(y|x) ∝ p(x|y)·p(y)</code> — the model scores the image under all 10 digits (ELBO ≈ log p(x|y)).</p>
+
+            <div class="typ">
+              <div class="typ-h"><span>Typicality</span><span id="typPct"></span></div>
+              <div class="meter"><div id="typBar"></div></div>
+              <div id="typLabel" class="small"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- generation row -->
+        <div class="card gen-row">
+          <div class="card-h"><span class="step g">4</span>
+            <div><h2>What the generative model can do that a classifier can't</h2>
+              <p class="tag">Reconstruct your digit &amp; create brand-new ones</p></div>
+          </div>
+          <div class="gen-flex">
+            <figure class="fig">
+              <img id="inSmall" class="pix" width="112" height="112" alt="Your input">
+              <figcaption>Your input</figcaption>
+            </figure>
+            <div class="arrow" aria-hidden="true">→</div>
+            <figure class="fig">
+              <img id="recon" class="pix" width="112" height="112" alt="Reconstruction">
+              <figcaption>CVAE redraws it<br><span class="muted" id="reconL"></span></figcaption>
+            </figure>
+            <div class="sep"></div>
+            <div class="gen-samples">
+              <div class="mini-h">Brand-new samples of “<span id="sampD">–</span>”</div>
+              <div id="gSamples" class="sgrid"></div>
+              <button id="btnMore" class="btn ghost sm">Generate again ↻</button>
+            </div>
+            <div class="sep"></div>
+            <div class="latent-box">
+              <div class="mini-h">Your digit in latent “style space”</div>
+              <div class="latent-wrap">
+                <img id="lgrid" class="pix" alt="Latent style map" width="210" height="210">
+                <div id="ldot" class="ldot"></div>
+              </div>
+              <div class="muted small" id="lcoord"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= STUDIO -->
+<section id="tab-studio" class="panel">
+  <div class="studio">
+    <div class="card controls">
+      <h2>Generator Studio</h2>
+      <p class="muted">Sample new digits from <code>p(x | y)</code>: pick a digit <code>y</code>, draw random <code>z ~ N(0, I)</code>, decode.</p>
+      <div class="mini-h">Digit to generate</div>
+      <div id="digitPick" class="digit-pick"></div>
+      <label class="lbl">Number of samples <b id="nVal">24</b>
+        <input id="nSamp" type="range" min="4" max="48" step="4" value="24"></label>
+      <label class="lbl">Temperature (diversity) <b id="tVal">1.0</b>
+        <input id="temp" type="range" min="0.1" max="2.5" step="0.1" value="1.0"></label>
+      <label class="lbl">Random seed (blank = random)
+        <input id="seed" type="number" placeholder="e.g. 42"></label>
+      <button id="btnGen" class="btn primary wide">Generate</button>
+      <div class="stat-box">
+        <div class="mini-h">Classifier check</div>
+        <div class="stat" id="agreeRate">–</div>
+        <p class="muted small">Share of generated samples the discriminative model recognises as the requested digit. Raise the temperature and watch it drop.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Generated samples</h2><span class="muted small" id="genTime"></span></div>
+      <div id="genGrid" class="gen-grid"></div>
+      <p class="muted small legend"><span class="ok">✓</span> classifier agrees · <span class="bad">✗</span> classifier reads it as a different digit</p>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Latent style map</h2><span class="muted small">digit <b id="lmD">0</b></span></div>
+      <img id="lmap" class="pix lmap" alt="Latent style map" width="420" height="420">
+      <p class="muted small">Each cell decodes a point <code>(z₁, z₂)</code> on a grid from −2.5 to +2.5. The label is fixed; only the <i>style</i> (slant, thickness, width) changes smoothly — the model has learned a continuous space of handwriting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= REPORT -->
+<section id="tab-report" class="panel">
+  <div class="kpis" id="kpis"></div>
+  <div class="report-grid">
+    <div class="card"><h2>Classifier training</h2><p class="muted small">Train loss and test accuracy per epoch</p><div id="chClf" class="chart"></div></div>
+    <div class="card"><h2>CVAE training</h2><p class="muted small">Negative ELBO = reconstruction loss + KL divergence (nats / image)</p><div id="chVae" class="chart"></div></div>
+    <div class="card"><h2>Confusion matrix (classifier, 10 000 test images)</h2><div id="cm" class="cm"></div></div>
+    <div class="card"><h2>Head-to-head</h2><table class="tbl" id="h2h"></table>
+      <p class="muted small">Both were trained on the same 60 000 MNIST images. The classifier spends all its capacity on drawing boundaries between classes, so it classifies better. The CVAE spends its capacity modelling the whole image — which lets it generate, reconstruct and judge typicality.</p></div>
+  </div>
+</section>
+
+<!-- ======================================================= THEORY -->
+<section id="tab-theory" class="panel">
+  <div class="theory">
+    <div class="card">
+      <h2>Two ways to model the same data</h2>
+      <div class="formula-row">
+        <div class="formula d"><div class="f-name">Discriminative</div><div class="f-eq">p(y | x)</div><p>Learns the <b>decision boundary</b>. Given an image, outputs a probability for each label. Cannot create images.</p></div>
+        <div class="formula g"><div class="f-name">Generative</div><div class="f-eq">p(x | y) · p(y)</div><p>Learns <b>how the data is distributed</b>. Can sample new images, and can still classify through Bayes' rule.</p></div>
+      </div>
+      <table class="tbl cmp">
+        <thead><tr><th></th><th class="c-d">Discriminative (CNN)</th><th class="c-g">Generative (CVAE)</th></tr></thead>
+        <tbody>
+          <tr><td>Question answered</td><td>Which digit is this?</td><td>What does a digit look like? How likely is this image?</td></tr>
+          <tr><td>Output</td><td>Label + confidence</td><td>New images, reconstructions, likelihoods</td></tr>
+          <tr><td>Inference</td><td>One forward pass</td><td>Encode + decode for each of 10 classes, then Bayes' rule</td></tr>
+          <tr><td>Training loss</td><td>Cross-entropy on labels</td><td>Reconstruction loss + KL divergence (ELBO)</td></tr>
+          <tr><td>Accuracy as classifier</td><td>Higher</td><td>Lower (capacity spent on modelling pixels)</td></tr>
+          <tr><td>Out-of-distribution input</td><td>Still gives a (often confident) label</td><td>Low likelihood → can flag it as atypical</td></tr>
+          <tr><td>Examples</td><td>Logistic regression, SVM, CNN, BERT classifier</td><td>Naive Bayes, VAE, GAN, Diffusion, GPT</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>How the models in this app work</h2>
+      <ol class="steps">
+        <li><b>Preprocessing.</b> Your drawing is converted to MNIST format: inverted if needed (white ink on black), cropped, scaled to fit 20×20 and centred by centre of mass in a 28×28 frame.</li>
+        <li><b>Classifier.</b> Conv(16) → ReLU → MaxPool → Conv(32) → ReLU → MaxPool → Dense(128) → Dense(10) → Softmax.</li>
+        <li><b>CVAE encoder.</b> Image + one-hot label → 512 → 256 → (μ, log σ²) of a 2-D latent <code>z</code>.</li>
+        <li><b>CVAE decoder.</b> <code>z</code> + one-hot label → 256 → 512 → 784 pixel probabilities.</li>
+        <li><b>Generation.</b> Sample <code>z ~ N(0, I)</code>, choose a label, decode → a new digit that never existed.</li>
+        <li><b>Generative classification.</b> Compute ELBO(x, y) for y = 0…9, add log p(y), softmax → p(y | x).</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>Experiments to try</h2>
+      <ul class="checks">
+        <li><b>Classification vs generation:</b> draw a clean “7”. Both models agree — but only the generative one can then produce new 7s.</li>
+        <li><b>Ambiguous digit:</b> draw something between a 4 and a 9. Compare how the two probability bars split.</li>
+        <li><b>Out-of-distribution:</b> scribble or draw a letter “A”. The classifier still picks a digit, often confidently; the typicality meter drops.</li>
+        <li><b>Model inference:</b> compare inference times — one pass for the classifier vs 10 encode/decode passes for the generative model.</li>
+        <li><b>Temperature:</b> in Generator Studio raise the temperature to 2.5 and watch the classifier agreement fall.</li>
+        <li><b>Latent space:</b> look where your digit lands on the style map — neighbouring cells share its slant and thickness.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">Generative vs. Discriminative Model Lab · MNIST · Flask + NumPy inference · runs fully offline</footer>
+<div id="toast" class="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
