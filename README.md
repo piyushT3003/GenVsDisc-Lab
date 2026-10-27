@@ -1,153 +1,221 @@
-# Generative vs. Discriminative Model Lab
+# 🧠 GenVsDisc Lab — Generative vs. Discriminative Model Laboratory
 
-A web application where a user **draws or uploads a handwritten digit** and sees how a
-**classifier (discriminative model)** and a **generative model** each handle it.
+### An Interactive Machine Learning Laboratory for Digit Classification and Generation
 
-| Requirement | How it is met |
-|---|---|
-| **Frontend:** digit drawing canvas or image upload | 280×280 drawing canvas (mouse + touch, undo, brush size), image upload (photos of paper are auto-inverted), and 50 real MNIST test digits to click |
-| **Backend:** trained MNIST classifier + small generative model | Flask server loads a trained **CNN classifier** (99.1 % test accuracy) and a trained **Conditional VAE** (2-D latent space) |
-| **Output:** predicted digit, confidence, generated samples | Predicted digit, confidence %, probability bar chart, 8 newly generated samples of the predicted digit, reconstruction, latent style map, plus a Generator Studio for any digit |
-| **Should test:** classification vs generation, model inference, discriminative vs generative | Side-by-side panels, inference-time display, Bayes-rule classification by the generative model, typicality (out-of-distribution) meter, Model Report tab, and an automated test suite (`tests/test_lab.py`) |
+<p align="center">
+  <strong>Explore the difference between discriminative and generative AI through an interactive web application.</strong>
+</p>
 
 ---
 
-## ▶ How to run (friend's laptop)
+## 🚀 Live Demo
 
-**Only requirement:** Python 3.9 or newer — <https://www.python.org/downloads/>
-(on Windows, tick **"Add Python to PATH"** while installing). Internet is needed only the first
-time, to install three small packages (Flask, NumPy, Pillow ≈ 30 MB). **PyTorch is NOT needed.**
+### **[🌐 Launch GenVsDisc Lab](YOUR_VERCEL_DEPLOYMENT_URL)**
 
-1. Unzip the folder (right-click → *Extract All* — do not run it from inside the zip).
-2. Start it:
-   - **Windows:** double-click **`RUN_WINDOWS.bat`**
-   - **macOS:** right-click **`RUN_MAC.command`** → *Open* → *Open*
-     (or in Terminal: `bash RUN_MAC.command`)
-   - **Linux:** `bash RUN_MAC.command`
-3. The browser opens automatically at `http://127.0.0.1:5050`. Keep the black terminal window open while using the app.
+> Deployment: https://gen-vs-disc-lab.vercel.app/
 
-**Manual method** (any OS):
+---
+
+## 📌 About the Project
+
+**GenVsDisc Lab** is an interactive machine learning web application designed to demonstrate the fundamental differences between discriminative and generative models.
+
+The application allows users to experiment with handwritten digit recognition, explore classification predictions, and generate digit-like images through a browser-based interface.
+
+Rather than simply presenting theoretical concepts, GenVsDisc Lab provides a practical environment for exploring how different machine learning approaches process and generate data.
+
+## ✨ Key Features
+
+- **✍️ Interactive Digit Drawing:** Draw handwritten digits directly on the canvas.
+- **🖼️ Image Upload:** Upload digit images for model inference.
+- **🔍 Digit Classification:** Predict digit classes using a CNN-based classifier.
+- **📊 Prediction Probabilities:** Explore model predictions and their confidence scores.
+- **🎨 Digit Generation:** Generate digit-like images using a Conditional Variational Autoencoder (CVAE).
+- **📈 Model Metrics:** Explore available evaluation metrics and model reports.
+- **🧪 Interactive Experimentation:** Compare classification and generation within a unified interface.
+- **💻 Browser-Based Interface:** Access the application without installing the project locally when using the deployed version.
+
+## 🧠 Models Used
+
+### 1. Discriminative Model — CNN Classifier
+
+A Convolutional Neural Network (CNN) classifier predicts the class of an input image.
+
+**Primary objective:** Learn the relationship between input images and their corresponding labels.
+
+**Example:** Given an image of a handwritten digit, predict whether it represents `0`, `1`, `2`, and so on.
+
+### 2. Generative Model — Conditional Variational Autoencoder
+
+A Conditional Variational Autoencoder (CVAE) learns a latent representation of the input data and generates new samples conditioned on a selected class.
+
+**Primary objective:** Learn useful representations of the data and generate new digit-like images.
+
+**Example:** Generate a new image conditioned on the digit `7`.
+
+### Generative vs. Discriminative Learning
+
+| Aspect | Discriminative Model | Generative Model |
+|---|---|---|
+| Main objective | Predict the target class | Learn data representations and generate samples |
+| Input | Image or digit sample | Selected class or conditioning input |
+| Output | Predicted class and probabilities | Generated digit-like image |
+| Model used | CNN classifier | Conditional VAE |
+| Application | Image classification | Image generation |
+
+*Actual capabilities depend on the trained models and the implementation included in this repository.*
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Application and machine learning logic |
+| Flask | Web application and API endpoints |
+| NumPy | Numerical computation and model inference |
+| Pillow | Image processing |
+| HTML5 | Application structure |
+| CSS3 | User interface styling |
+| JavaScript | Interactive features and API communication |
+| Vercel | Cloud deployment |
+| GitHub | Source code management |
+
+## 📂 Project Structure
+
+```text
+GenVsDisc-Lab/
+│
+├── app.py                 # Flask application and API routes
+├── requirements.txt       # Python dependencies
+├── README.md              # Project documentation
+├── RUN_WINDOWS.bat        # Windows launch script
+├── RUN_MAC.command        # macOS launch script
+│
+├── models/                # Model inference and saved artifacts
+├── static/                # Frontend HTML, CSS, and JavaScript
+├── training/              # Model training scripts
+├── tests/                 # Project tests
+└── docs/                  # Additional documentation
+```
+
+*The structure above is illustrative. Refer to the repository for the actual files and directories.*
+
+## ⚙️ Run Locally
+
+### Prerequisites
+
+- Python 3.9 or a compatible version supported by the project dependencies.
+- pip package manager.
+- Git (optional).
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/GenVsDisc-Lab.git
+```
+
+Navigate into the project directory:
+
+```bash
+cd GenVsDisc-Lab
+```
+
+Replace `YOUR_GITHUB_USERNAME` with your GitHub username.
+
+### Step 2: Create a Virtual Environment
+
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\activate      Mac/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+```
+
+### Step 3: Activate the Environment
+
+**Windows:**
+
+```bash
+.venv\Scripts\activate
+```
+
+**macOS / Linux:**
+
+```bash
+source .venv/bin/activate
+```
+
+### Step 4: Install Dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Step 5: Start the Application
+
+```bash
 python app.py
 ```
 
-Run the tests: `python tests/test_lab.py` → should print **10/10 tests passed**.
+### Step 6: Open in Your Browser
+
+Visit:
+
+```text
+http://127.0.0.1:5050
+```
+
+Keep the terminal open while using the application.
+
+## ☁️ Deployment
+
+The project can be deployed using Vercel's Python/Flask support.
+
+1. Push the project to a GitHub repository.
+2. Import the repository into Vercel.
+3. Configure the project according to the Vercel Flask deployment requirements.
+4. Deploy the application.
+5. Test the homepage, API endpoints, classification, and generation features.
+6. Update the Live Demo link at the top of this README with the actual deployment URL.
+
+**Deployment URL:** `YOUR_VERCEL_DEPLOYMENT_URL`
+
+**Deployment documentation:** [Vercel Flask Documentation](https://vercel.com/docs/frameworks/backend/flask)
+
+## 🎯 Learning Objectives
+
+This project demonstrates:
+
+- The difference between generative and discriminative learning.
+- How CNNs can be used for image classification.
+- How conditional VAEs can generate class-conditioned samples.
+- How model inference can be integrated into a Flask application.
+- How frontend components communicate with backend APIs.
+- How machine learning applications can be prepared for cloud deployment.
+
+## 🔮 Future Improvements
+
+Potential enhancements include:
+
+- Additional classification and generation models.
+- More detailed model evaluation and comparison.
+- Improved inference visualization.
+- Expanded testing and error handling.
+- Additional datasets and experimentation options.
+
+## 👨‍💻 Author
+
+**Your Name**
+
+- GitHub: [YOUR_GITHUB_USERNAME](https://github.com/YOUR_GITHUB_USERNAME)
+- Project Repository: `https://github.com/YOUR_GITHUB_USERNAME/GenVsDisc-Lab`
+- Live Demo: [GenVsDisc Lab](YOUR_VERCEL_DEPLOYMENT_URL)
+
+Replace the placeholders with your details before publishing.
+
+## 📄 License
+
+Add a license if you intend to distribute the project for reuse. Until a license is specified, the repository remains subject to applicable copyright law.
 
 ---
 
-## Aim
-To build an application that compares a **discriminative model** and a **generative model**
-on the same handwritten-digit input, and to study the difference between classification and generation.
-
-## Theory
-| | Discriminative | Generative |
-|---|---|---|
-| Models | `p(y \| x)` — the decision boundary | `p(x \| y)·p(y)` — how the data itself is distributed |
-| Question | "Which digit is this?" | "What does a digit look like? How likely is this image?" |
-| Can create new data | No | Yes |
-| Can classify | Yes, directly | Yes, using Bayes' rule `p(y\|x) ∝ p(x\|y)·p(y)` |
-| Examples | Logistic regression, SVM, CNN | Naive Bayes, VAE, GAN, Diffusion models, GPT |
-
-**Conditional VAE.** An encoder maps (image, label) to a Gaussian over a latent vector `z`;
-a decoder maps (`z`, label) back to an image. It is trained to maximise the **ELBO**
-(reconstruction log-likelihood − KL divergence), a lower bound on `log p(x | y)`.
-To generate, sample `z ~ N(0, I)`, choose a label and decode.
-
-## Models
-
-| | Classifier (discriminative) | CVAE (generative) |
-|---|---|---|
-| Architecture | Conv(16,3×3)–ReLU–MaxPool → Conv(32,3×3)–ReLU–MaxPool → Dense(128)–Dropout → Dense(10) | Encoder 794→512→256→(μ, log σ²) ∈ ℝ² · Decoder (2+10)→256→512→784 |
-| Parameters | 206,922 | 1,076,500 |
-| Training | 6 epochs, Adam, cross-entropy, light augmentation (±12° rotation, shift, scale) | 40 epochs, Adam, −ELBO (Bernoulli reconstruction + KL) |
-| Result on 10,000 test images | **99.1 % accuracy** | **94.1 %** accuracy when used as a classifier via Bayes' rule · median ELBO −125 nats |
-
-Both models were trained with PyTorch on the 60,000 MNIST training images
-(`training/train_models.py`) and exported to NumPy `.npz` files. The app runs inference in
-pure NumPy (verified to match PyTorch to within 6×10⁻⁶), which is why PyTorch is not needed to run it.
-
-## Procedure / how the app works
-1. **Input** — user draws on the canvas, uploads an image, or picks a real MNIST digit.
-2. **Preprocessing** (`models/inference.py → preprocess`) — convert to greyscale, invert if the
-   background is light, remove background, crop to the digit, scale to fit 20×20, place in 28×28
-   and centre by centre of mass (the exact MNIST recipe).
-3. **Discriminative inference** — one forward pass of the CNN → softmax → predicted digit + confidence.
-   Layer-1 feature maps are shown.
-4. **Generative inference** — the CVAE computes the ELBO of the image under each of the 10 labels,
-   applies Bayes' rule with a uniform prior → its own prediction. The best ELBO is compared with the
-   distribution on real test digits to give a **typicality percentile**.
-5. **Generation** — the CVAE reconstructs the user's digit, samples 8 new digits of the predicted
-   class, and places the digit on the 2-D latent **style map**.
-6. **Generator Studio** — generate 4–48 samples of any digit with a temperature control; every sample is
-   graded by the classifier.
-7. **Model Report** — training curves, confusion matrix and head-to-head comparison.
-
-## Output / observations
-Screenshots are in `docs/screenshots/`.
-
-| Experiment | Observation |
-|---|---|
-| Clean "7" drawn on canvas | Both models predict 7. Classifier ≈ 100 % confident (1 forward pass, ~1 ms); generative model agrees (10 passes, ~3 ms). Typicality ≈ 50th percentile. |
-| Random scribble (not a digit) | Classifier still outputs a digit with ~60 % confidence. Generative model's typicality drops to the 0th percentile → flags it as out-of-distribution. |
-| Photo of a dark "4" on light paper | Auto-inverted and centred; both models predict 4. |
-| Generator Studio, temperature 1.0 | ~100 % of generated digits recognised by the classifier as the requested class. |
-| Generator Studio, temperature 2.5 | Samples become distorted; classifier agreement falls (≈ 90 % or less). |
-| Latent style map | Moving across the 2-D latent grid changes slant and stroke thickness smoothly while the label stays fixed. |
-| Accuracy on 10,000 test images | Discriminative 99.1 % vs generative-via-Bayes 94.1 %. |
-
-## Result
-The discriminative CNN is the better **classifier** (99.1 % vs 94.1 %) and is faster at inference,
-because it learns only the decision boundary `p(y | x)`. The generative CVAE learns `p(x | y)`,
-which lets it **generate new digits, reconstruct inputs, and detect unusual / out-of-distribution
-inputs** — things the classifier cannot do — while still being able to classify through Bayes' rule.
-
----
-
-## Project structure
-```
-GenVsDisc_Lab/
-├── app.py                  Flask backend (API + serves the UI)
-├── models/
-│   ├── inference.py        NumPy inference: preprocessing, CNN, CVAE
-│   ├── classifier.npz      trained CNN weights
-│   ├── cvae.npz            trained CVAE weights
-│   ├── metrics.json        accuracy, loss curves, confusion matrix, ELBO stats
-│   └── sample_digits.npz   50 real MNIST test digits for the UI
-├── static/                 frontend (index.html, style.css, app.js) — no internet/CDN needed
-├── training/train_models.py   PyTorch training + export script (optional)
-├── tests/test_lab.py       automated tests (10 tests)
-├── docs/screenshots/       output screenshots
-├── RUN_WINDOWS.bat         one-click launcher (Windows)
-├── RUN_MAC.command         one-click launcher (macOS / Linux)
-└── requirements.txt        flask, numpy, pillow
-```
-
-## API
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/analyze` | `{image: dataURL}` → both models' predictions, confidences, ELBOs, reconstruction, samples |
-| POST | `/api/generate` | `{digit, n, temperature, seed}` → new samples + classifier check |
-| GET | `/api/latent_grid?digit=d` | decoded 10×10 latent style map |
-| GET | `/api/metrics` | training / evaluation metrics |
-| GET | `/api/samples` | real MNIST test digits |
-| GET | `/api/health` | status |
-
-## Retraining (optional)
-```bash
-pip install torch numpy
-python training/train_models.py                    # downloads MNIST via torchvision
-python training/train_models.py --data path/to/mnist_files   # or use local idx files
-```
-Training took ≈ 1 min (classifier) + ≈ 4 min (CVAE) on a laptop CPU.
-
-## Troubleshooting
-| Problem | Fix |
-|---|---|
-| `'python' is not recognized` | Reinstall Python and tick **Add Python to PATH**. |
-| macOS: "cannot be opened because it is from an unidentified developer" | Right-click `RUN_MAC.command` → *Open*, or run `bash RUN_MAC.command` in Terminal. |
-| Browser didn't open | Open the address printed in the terminal (e.g. `http://127.0.0.1:5050`). |
-| Port in use | The app automatically picks the next free port (5051, 5052 …) and prints it. |
-| `pip install` fails | Check the internet connection (needed only on the first run). |
+<p align="center">
+  <strong>GenVsDisc Lab</strong><br>
+  Making Generative and Discriminative Machine Learning Interactive.
+</p>
