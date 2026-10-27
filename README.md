@@ -10,9 +10,9 @@
 
 ## 🚀 Live Demo
 
-### **[🌐 Launch GenVsDisc Lab](YOUR_VERCEL_DEPLOYMENT_URL)**
+### **[🌐 https://gen-vs-disc-lab.vercel.app/)**
 
-> Deployment: https://gen-vs-disc-lab.vercel.app/
+
 
 ---
 
